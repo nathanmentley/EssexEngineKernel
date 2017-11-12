@@ -19,14 +19,13 @@ EssexEngine::Kernel::Kernel(WeakPointer<Context> _context, std::string filename)
     context->GetDaemon<EssexEngine::Daemons::FileSystem::FileSystemDaemon>()->LoadZipArchive(filename);
     context->GetDaemon<EssexEngine::Daemons::Gfx::GfxDaemon>()->Setup();
 	
-	context->GetStateStack()->Push(initState.GetWeakPointer());
+	context->GetStateStack()->Push(initState);
     
-    //TODO: Use Log Daemon. Not Driver
-    context->GetDriver<EssexEngine::Core::Logging::ILogDriver>()->LogLine(
+    context->GetDaemon<EssexEngine::Core::Logging::LogDaemon>()->LogLine(
         "Starting Kernel [%s]",
         GetKernelVersion().c_str()
     );
-    context->GetDriver<EssexEngine::Core::Logging::ILogDriver>()->LogLine(
+    context->GetDaemon<EssexEngine::Core::Logging::LogDaemon>()->LogLine(
         "Starting Starting App [%s] [%s]",
         context->GetBaseApp()->GetAppName().c_str(),
         context->GetBaseApp()->GetAppVersion().c_str()

@@ -1,7 +1,7 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
-#include <EssexEngineCore/UniquePointer.h>
+#include <EssexEngineCore/WeakPointer.h>
 #include <EssexEngineCore/WeakPointer.h>
 #include <EssexEngineCore/EssexEnvironment.h>
 #include <EssexEngineCore/Context.h>
@@ -26,7 +26,7 @@ namespace EssexEngine {
 			void Start();
 		private:
 			WeakPointer<Context> context;
-			UniquePointer<Core::Models::IState> initState;
+			WeakPointer<Core::Models::IState> initState;
 	};
 };
 
