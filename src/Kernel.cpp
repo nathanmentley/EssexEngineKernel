@@ -49,8 +49,10 @@ void EssexEngine::Kernel::Start() {
     context->GetDaemon<EssexEngine::Daemons::System::SystemDaemon>()->StartTimer();
     
     while(!context->GetStateStack()->IsEmpty()) {
+        context->GetDaemon<EssexEngine::Daemons::Window::WindowDaemon>()->RepaintWindows();
+
         int milliseconds = context->GetDaemon<EssexEngine::Daemons::System::SystemDaemon>()->GetElapsedTime();
-        if (milliseconds >= 16) {
+        if (milliseconds >= 16) {//TODO: make this smarter
             doLogic = true;
             doRedraw = true;
             context->GetDaemon<EssexEngine::Daemons::System::SystemDaemon>()->StartTimer();
@@ -70,8 +72,6 @@ void EssexEngine::Kernel::Start() {
         }
         
         if(doRedraw) {
-            context->GetDaemon<EssexEngine::Daemons::Window::WindowDaemon>()->RepaintWindows();
-
             context->GetDaemon<EssexEngine::Daemons::Gfx::GfxDaemon>()->StartRender();
         
             for(int i = context->GetStateStack()->GetLength() - 1; i >= 0; i--) {
