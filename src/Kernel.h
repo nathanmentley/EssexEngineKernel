@@ -15,19 +15,24 @@
 #include <EssexEngineWindowDaemon/WindowDaemon.h>
 
 namespace EssexEngine {
-	class Kernel
-	{
-		public:
+    class Kernel
+    {
+        public:
             Kernel(WeakPointer<Context> _context, std::string filename);
-			~Kernel();
+            ~Kernel();
 
-			std::string GetKernelVersion() { return ESSEX_ENGINE_VERSION; }
-			
-			void Start();
-		private:
-			WeakPointer<Context> context;
-			WeakPointer<Core::Models::IState> initState;
-	};
+            std::string GetKernelVersion() { return ESSEX_ENGINE_VERSION; }
+            
+            void Start();
+        private:
+            WeakPointer<Context> context;
+            WeakPointer<Core::Models::IState> initState;
+
+            UniquePointer<Daemons::Window::WindowDef> windowDef;
+            UniquePointer<Daemons::Window::CanvasDef> canvasDef;
+            UniquePointer<Daemons::Window::IWindow> mainWindow;
+            UniquePointer<Daemons::Window::IRenderContext> mainRenderContext;
+    };
 };
 
 #endif
