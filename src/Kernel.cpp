@@ -11,17 +11,30 @@
 
 #include <EssexEngineKernel/Kernel.h>
 
-EssexEngine::Kernel::Kernel(
+using EssexEngine::UniquePointer;
+using EssexEngine::Core::Logging::LogDaemon;
+
+using EssexEngine::Daemons::Window::WindowDef;
+using EssexEngine::Daemons::Window::CanvasDef;
+
+using EssexEngine::Daemons::FileSystem::FileSystemDaemon;
+using EssexEngine::Daemons::Window::WindowDaemon;
+using EssexEngine::Daemons::Gfx::GfxDaemon;
+using EssexEngine::Daemons::System::SystemDaemon;
+
+using EssexEngine::Kernel;
+
+Kernel::Kernel(
     WeakPointer<Context> _context,
     std::string filename
 ): windowDef(
-    EssexEngine::UniquePointer<EssexEngine::Daemons::Window::WindowDef>(
-        new EssexEngine::Daemons::Window::WindowDef(
+    UniquePointer<WindowDef>(
+        new WindowDef(
             "Game Window",
             100,
             100,
-            800,
-            600,
+            1024,
+            768,
             [this]() {
                 while(!context->GetStateStack()->IsEmpty()) {
                     context->GetStateStack()->Pop();
@@ -30,37 +43,36 @@ EssexEngine::Kernel::Kernel(
         )
     )
 ), canvasDef(
-    EssexEngine::UniquePointer<EssexEngine::Daemons::Window::CanvasDef>(
-        new EssexEngine::Daemons::Window::CanvasDef(
+    UniquePointer<CanvasDef>(
+        new CanvasDef(
             0,
             0,
-            800,
-            600
+            1024,
+            768
         )
     )
 ), mainWindow(
-    _context->GetDaemon<EssexEngine::Daemons::Window::WindowDaemon>()->CreateWindow(
+    _context->GetDaemon<WindowDaemon>()->CreateWindow(
         windowDef.ToWeakPointer()
     )
 ), mainRenderContext(
-    _context->GetDaemon<EssexEngine::Daemons::Window::WindowDaemon>()->AddCanvas(
+    _context->GetDaemon<WindowDaemon>()->AddCanvas(
         mainWindow.ToWeakPointer(),
         canvasDef.ToWeakPointer()
     )
 ) {
     context = _context;
-    initState = context->GetBaseApp()->GetInitState();
     
-    context->GetDaemon<EssexEngine::Daemons::FileSystem::FileSystemDaemon>()->LoadZipArchive(filename);
-    context->GetDaemon<EssexEngine::Daemons::Gfx::GfxDaemon>()->Setup(mainRenderContext.ToWeakPointer());
+    context->GetDaemon<FileSystemDaemon>()->LoadZipArchive(filename);
+    context->GetDaemon<GfxDaemon>()->Setup(mainRenderContext.ToWeakPointer());
     
-    context->GetStateStack()->Push(initState);
+    context->GetStateStack()->Push(context->GetBaseApp()->GetInitState());
     
-    context->GetDaemon<EssexEngine::Core::Logging::LogDaemon>()->LogLine(
+    context->GetDaemon<LogDaemon>()->LogLine(
         "Starting Kernel [%s]",
         GetKernelVersion().c_str()
     );
-    context->GetDaemon<EssexEngine::Core::Logging::LogDaemon>()->LogLine(
+    context->GetDaemon<LogDaemon>()->LogLine(
         "Starting Starting App [%s] [%s]",
         context->GetBaseApp()->GetAppName().c_str(),
         context->GetBaseApp()->GetAppVersion().c_str()
@@ -68,31 +80,31 @@ EssexEngine::Kernel::Kernel(
     
 }
 
-EssexEngine::Kernel::~Kernel()
+Kernel::~Kernel()
 {
-    context->GetDaemon<EssexEngine::Daemons::FileSystem::FileSystemDaemon>()->CloseZipArchive();
+    context->GetDaemon<FileSystemDaemon>()->CloseZipArchive();
     
     while(!context->GetStateStack()->IsEmpty()) {
         context->GetStateStack()->Pop();
     }
 }
 
-void EssexEngine::Kernel::Start() {
+void Kernel::Start() {
     bool doLogic = false;
     bool doRedraw = false;
 
-    context->GetDaemon<EssexEngine::Daemons::System::SystemDaemon>()->StartTimer();
+    context->GetDaemon<SystemDaemon>()->StartTimer();
     
     while(!context->GetStateStack()->IsEmpty()) {
-        context->GetDaemon<EssexEngine::Daemons::Window::WindowDaemon>()->RepaintWindows();
+        context->GetDaemon<WindowDaemon>()->RepaintWindows();
 
-        int milliseconds = context->GetDaemon<EssexEngine::Daemons::System::SystemDaemon>()->GetElapsedTime();
+        int milliseconds = context->GetDaemon<SystemDaemon>()->GetElapsedTime();
         if (milliseconds >= 16) {//TODO: make this smarter
             doLogic = true;
             doRedraw = true;
-            context->GetDaemon<EssexEngine::Daemons::System::SystemDaemon>()->StartTimer();
+            context->GetDaemon<SystemDaemon>()->StartTimer();
         } else {
-            context->GetDaemon<EssexEngine::Daemons::System::SystemDaemon>()->Sleep(1);
+            context->GetDaemon<SystemDaemon>()->Sleep(1);
         }
         
         if(doLogic) {
@@ -107,7 +119,7 @@ void EssexEngine::Kernel::Start() {
         }
         
         if(doRedraw) {
-            context->GetDaemon<EssexEngine::Daemons::Gfx::GfxDaemon>()->StartRender(mainRenderContext.ToWeakPointer());
+            context->GetDaemon<GfxDaemon>()->StartRender(mainRenderContext.ToWeakPointer());
         
             for(int i = context->GetStateStack()->GetLength() - 1; i >= 0; i--) {
                 context->GetStateStack()->GetRawData()[i]->Render();
@@ -117,8 +129,8 @@ void EssexEngine::Kernel::Start() {
                 }
             }
         
-            context->GetDaemon<EssexEngine::Daemons::Gfx::GfxDaemon>()->FinishRender(mainRenderContext.ToWeakPointer());
-            context->GetDaemon<EssexEngine::Daemons::Window::WindowDaemon>()->RepaintCanvas(mainRenderContext.ToWeakPointer());
+            context->GetDaemon<GfxDaemon>()->FinishRender(mainRenderContext.ToWeakPointer());
+            context->GetDaemon<WindowDaemon>()->RepaintCanvas(mainRenderContext.ToWeakPointer());
             
             doRedraw = false;
         }

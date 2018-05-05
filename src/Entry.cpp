@@ -9,10 +9,16 @@
  * this file. If not, please visit: https://github.com/nathanmentley/EssexEngine
  */
 
+#include <EssexEngineCore/WeakPointer.h>
 #include <EssexEngineKernel/Kernel.h>
 
+using EssexEngine::WeakPointer;
+using EssexEngine::Context;
+
+using EssexEngine::Kernel;
+
 extern "C" {
-    void kernel_init(EssexEngine::Context* context, std::string dataFilename) {
-	    EssexEngine::Kernel(context, dataFilename).Start();
+    void kernel_init(WeakPointer<Context> context, std::string dataFilename) {
+        Kernel(context, dataFilename).Start();
     }
 }
