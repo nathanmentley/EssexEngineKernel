@@ -21,6 +21,7 @@ using EssexEngine::Daemons::FileSystem::FileSystemDaemon;
 using EssexEngine::Daemons::Window::WindowDaemon;
 using EssexEngine::Daemons::Gfx::GfxDaemon;
 using EssexEngine::Daemons::System::SystemDaemon;
+using EssexEngine::Daemons::Config::ConfigDaemon;
 
 using EssexEngine::Kernel;
 
@@ -33,8 +34,8 @@ Kernel::Kernel(
             "Game Window",
             100,
             100,
-            1024,
-            768,
+            _context->GetDaemon<ConfigDaemon>()->GetScreenWidth(),
+            _context->GetDaemon<ConfigDaemon>()->GetScreenHeight(),
             [this]() {
                 while(!context->GetStateStack()->IsEmpty()) {
                     context->GetStateStack()->Pop();
@@ -47,8 +48,8 @@ Kernel::Kernel(
         new CanvasDef(
             0,
             0,
-            1024,
-            768
+            _context->GetDaemon<ConfigDaemon>()->GetScreenWidth(),
+            _context->GetDaemon<ConfigDaemon>()->GetScreenHeight()
         )
     )
 ), mainWindow(
@@ -99,11 +100,12 @@ void Kernel::Start() {
         context->GetDaemon<WindowDaemon>()->RepaintWindows();
 
         int milliseconds = context->GetDaemon<SystemDaemon>()->GetElapsedTime();
-        if (milliseconds >= 16) {//TODO: make this smarter
+        if (milliseconds >= 16) {
             doLogic = true;
             doRedraw = true;
             context->GetDaemon<SystemDaemon>()->StartTimer();
         } else {
+            doRedraw = true;
             context->GetDaemon<SystemDaemon>()->Sleep(1);
         }
         

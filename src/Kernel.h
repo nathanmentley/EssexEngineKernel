@@ -20,6 +20,7 @@
 #include <EssexEngineCore/LogDaemon.h>
 #include <EssexEngineFileSystemDaemon/FileSystemDaemon.h>
 #include <EssexEngineGfxDaemon/GfxDaemon.h>
+#include <EssexEngineConfigDaemon/ConfigDaemon.h>
 #include <EssexEngineSystemDaemon/SystemDaemon.h>
 #include <EssexEngineWindowDaemon/WindowDaemon.h>
 
