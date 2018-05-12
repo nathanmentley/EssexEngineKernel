@@ -1,7 +1,3 @@
 ee_setup_project("EssexEngineKernel" "src/System/Kernel/")
 target_link_libraries(EssexEngineKernel EssexEngineCore)
-target_link_libraries(EssexEngineKernel EssexEngineSystemDaemon)
 target_link_libraries(EssexEngineKernel EssexEngineFileSystemDaemon)
-target_link_libraries(EssexEngineKernel EssexEngineWindowDaemon)
-target_link_libraries(EssexEngineKernel EssexEngineGfxDaemon)
-target_link_libraries(EssexEngineKernel EssexEngineConfigDaemon)

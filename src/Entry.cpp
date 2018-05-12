@@ -18,7 +18,7 @@ using EssexEngine::Context;
 using EssexEngine::Kernel;
 
 extern "C" {
-    void kernel_init(WeakPointer<Context> context, std::string dataFilename) {
-        Kernel(context, dataFilename).Start();
+    void* kernel_init(WeakPointer<Context> context, std::string dataFilename) {
+        return new Kernel(context, dataFilename);
     }
 }
