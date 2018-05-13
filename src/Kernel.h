@@ -14,9 +14,10 @@
 #include <EssexEngineCore/EssexEnvironment.h>
 #include <EssexEngineCore/Context.h>
 #include <EssexEngineCore/IKernel.h>
-
 #include <EssexEngineCore/LogDaemon.h>
+
 #include <EssexEngineFileSystemDaemon/FileSystemDaemon.h>
+#include <EssexEngineSystemDaemon/SystemDaemon.h>
 
 namespace EssexEngine {
     class Kernel: public Core::IKernel
@@ -33,5 +34,6 @@ namespace EssexEngine {
             void RunApp(WeakPointer<Core::IApp> app);
         private:
             WeakPointer<Context> context;
+            bool running;
     };
 };

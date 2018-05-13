@@ -18,6 +18,7 @@ using EssexEngine::Core::IKernel;
 using EssexEngine::Core::Logging::LogDaemon;
 
 using EssexEngine::Daemons::FileSystem::FileSystemDaemon;
+using EssexEngine::Daemons::System::SystemDaemon;
 
 using EssexEngine::Kernel;
 
@@ -26,6 +27,7 @@ Kernel::Kernel(
     std::string filename
 ): IKernel() {
     context = _context;
+    running = true;
     
     context->GetDaemon<LogDaemon>()->LogLine(
         "Starting Kernel [%s]",
@@ -41,11 +43,20 @@ Kernel::~Kernel()
 }
 
 void Kernel::Start() {
+    while(running) {
+        context->GetDaemon<SystemDaemon>()->Sleep(500);
+    }
 }
 
 void Kernel::Stop() {
+    running = false;
 }
 
 void Kernel::RunApp(WeakPointer<IApp> app) {
+    //thread appThread(&IApp::Execute, app.Get());
+    
     app->Execute();
+    //appThread.join();
+
+    Stop();
 }
